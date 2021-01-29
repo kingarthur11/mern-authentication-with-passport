@@ -11,7 +11,7 @@ function App() {
     axios({
       method: "POST",
       data: {
-        userName: registerUsername,
+        username: registerUsername,
         password: registerPassword
       },
       withCredentials: true,

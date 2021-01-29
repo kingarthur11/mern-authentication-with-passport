@@ -1,9 +1,9 @@
-module.exports = mongoose => {
-    const User = mongoose.model(
-        "user", 
-        mongoose.Schema(
-            {
-                userName: {
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema
+
+User = mongoose.model(
+        "user", Schema( {
+                username: {
                     type: String,
                     required: true,
                     min: 6,
@@ -21,5 +21,4 @@ module.exports = mongoose => {
             {timestamps: true}
         )
     );
-    return User;
-}
+module.exports = User;

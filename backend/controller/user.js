@@ -1,10 +1,11 @@
 const {loginValidn, signupValidn} = require('../model/check')
 const byCrypT = require('bcryptjs')
-const db = require("../model/dataBase");
-const User = db.user;
+const passport = require('passport');
+require('../passportConfig')(passport)
+const User = require("../model/user");
 
 exports.signup = async (req, res) => {
-    const {userName, password} = req.body;
+    const {username, password} = req.body;
     const salt = await byCrypT.genSalt(10);
     const hashPwd = await byCrypT.hash(password, salt)
     const {error} = signupValidn.validate(req.body)
@@ -12,7 +13,7 @@ exports.signup = async (req, res) => {
         return res.status(400).send(error.details[0].message);   
     else {
         const user = new User({
-        userName,
+        username,
         password: hashPwd, 
             });
         user.save(user)
@@ -27,18 +28,22 @@ exports.signup = async (req, res) => {
     }
 };
 
-exports.login = async (req, res) => {
-    const {userName, password} = req.body;    
-    const {error} = loginValidn.validate(req.body)
-    if (error) 
-        return res.status(400).send(error.details[0].message); 
-    const passIsValid = byCrypT.compareSync(password, user.password);  
-    if (!passIsValid) {
-        return res.status(400).send('password is incorrect');   
-    }
+exports.login = (req, res, next) => {
+    console.log('happi')
+    passport.authenticate("local", (err, user, info) => {
+        if (err) throw err;
+        if (!user) res.send("no user in the database")
+        else{ 
+            req.login(user, err => {
+                if(err) throw err;
+                res.send('successfully authenticated')
+            })
+        }
+    })(req, res, next)
+        
 };
 
- exports.findAll = async (req, res) => {
+exports.findAll = async (req, res) => {
      try {
          const user = await User.find({});
          res.send({users: user})
